@@ -11,7 +11,7 @@ fn main() -> Result<(), Box<std::error::Error>> {
     let application =
         Application::new(Some("com.github.gtk-rs.examples.basic"), Default::default())?;
 
-    application.connect_activate(move |app| {
+    application.connect_activate(|app| {
         let window = ApplicationWindow::new(app);
         window.set_title("First GTK+ Program");
         window.set_default_size(350, 70);
