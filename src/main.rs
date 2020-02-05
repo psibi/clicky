@@ -3,25 +3,28 @@ extern crate gtk;
 
 use gio::prelude::*;
 use gtk::prelude::*;
+use std::rc::Rc;
 use std::cell::RefCell;
+use std::error::Error;
+use std::io::Write;
 
 use gtk::{Application, ApplicationWindow, Button};
 
-fn main() -> Result<(), Box<std::error::Error>> {
+fn main() -> Result<(), Box<dyn Error>> {
     let application =
         Application::new(Some("com.github.gtk-rs.examples.basic"), Default::default())?;
 
-    application.connect_activate(|app| {
+    let file = std::fs::File::create("mylog.txt")?;
+    let file = Rc::new(RefCell::new(file));
+
+    application.connect_activate(move |app| {
         let window = ApplicationWindow::new(app);
         window.set_title("First GTK+ Program");
         window.set_default_size(350, 70);
 
         let button = Button::new_with_label("Click me!");
 
-        use std::io::Write;
-        let file = std::fs::File::create("mylog.txt").unwrap();
-        let file = RefCell::new(file);
-
+        let file = file.clone();
         button.connect_clicked(
             move |_| match file.borrow_mut().write_all(b"I was clicked.\n") {
                 Ok(()) => (),
